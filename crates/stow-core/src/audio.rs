@@ -1091,9 +1091,12 @@ mod tests {
         assert!(!rec.is_recording());
         let info = rec.take_auto_stopped().expect("result is waiting").unwrap();
         assert_eq!(info.path, path);
+        // The fake source writes 10 ms per `sleep(10ms)`, and sleeps overrun on a loaded CI runner
+        // (40 ms of audio in 150 ms of wall time has been seen). The limit is wall-clock, so only
+        // require that audio was captured and that recording stopped well before 1 s.
         assert!(
-            (50..=1000).contains(&info.duration_ms),
-            "about 150 ms of audio, got {}",
+            (10..=1000).contains(&info.duration_ms),
+            "at least one 10 ms chunk and well under 1 s of audio, got {}",
             info.duration_ms
         );
         let samples = read_wav_16k_f32(&path).unwrap();

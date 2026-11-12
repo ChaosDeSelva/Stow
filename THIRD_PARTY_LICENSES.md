@@ -62,7 +62,7 @@ Production dependencies of `apps/stow-app` (plus the Svelte runtime, which Vite 
 | `@tauri-apps/plugin-opener` | 2.7.2 | MIT OR Apache-2.0 | https://github.com/tauri-apps/plugins-workspace |
 | `@types/trusted-types` | 2.0.7 | MIT | https://github.com/DefinitelyTyped/DefinitelyTyped.git |
 | `dompurify` | 3.4.17 | (MPL-2.0 OR Apache-2.0) | git://github.com/cure53/DOMPurify.git |
-| `marked` | 16.4.2 | MIT | git://github.com/markedjs/marked.git |
+| `marked` | 18.1.3 | MIT | git+https://github.com/markedjs/marked.git |
 | `svelte` | 5.57.3 | MIT | git+https://github.com/sveltejs/svelte.git |
 
 ### @fontsource/ibm-plex-sans 5.3.0
@@ -1251,7 +1251,7 @@ Creator: Person: Daniel Thompson-Yvetot
    limitations under the License.
 ```
 
-### marked 16.4.2
+### marked 18.1.3
 
 ```text
 # License information
