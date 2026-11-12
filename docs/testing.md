@@ -6,10 +6,10 @@ How Stow is tested, what runs in CI, what can't run in CI, and the backlog of te
 
 | Layer | Runner | Isolation | Where it runs |
 |---|---|---|---|
-| `stow-core` unit and integration tests | `cargo test` | `tempfile` data dirs; HTTP via `wiremock`; no Keychain, microphone, or real network | `macos-14` (Metal, CoreAudio, AppKit are needed to link) |
-| `stow-cli` integration tests | `cargo test` + `assert_cmd` | Binary run against a temp `STOW_DATA_DIR`; `--no-fetch` or wiremock | `macos-14` |
-| `stow-app` Rust tests (server, settings validation, chrome script building, shortcut parsing, scheduler helpers) | `cargo test` | Loopback ports; no window | `macos-14` |
-| Frontend | Vitest + jsdom, real Svelte 5 mounts | `@tauri-apps/api` mocked | CI runs on `macos-14` alongside the build; it would also pass on Linux |
+| `stow-core` unit and integration tests | `cargo test` | `tempfile` data dirs; HTTP via `wiremock`; no Keychain, microphone, or real network | `macos-latest` (Metal, CoreAudio, AppKit are needed to link) |
+| `stow-cli` integration tests | `cargo test` + `assert_cmd` | Binary run against a temp `STOW_DATA_DIR`; `--no-fetch` or wiremock | `macos-latest` |
+| `stow-app` Rust tests (server, settings validation, chrome script building, shortcut parsing, scheduler helpers) | `cargo test` | Loopback ports; no window | `macos-latest` |
+| Frontend | Vitest + jsdom, real Svelte 5 mounts | `@tauri-apps/api` mocked | CI runs on `macos-latest` alongside the build; it would also pass on Linux |
 | Extension | `node --test 'extension/*.test.mjs'` against `lib.js` | No Chrome APIs | `ubuntu-latest` |
 | Supply chain | `cargo deny check`, `cargo audit`, `npm audit --omit=dev` | — | with the Rust and frontend jobs |
 | Version sync | `scripts/check-version-sync.sh` | — | `ubuntu-latest` |

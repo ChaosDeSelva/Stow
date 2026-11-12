@@ -7,6 +7,8 @@ on:
   push:
     tags: ["v*"]
 
+# No cache action here: this job holds the signing secrets, so it runs only pinned
+# first-party actions and a cold build.
 permissions:
   contents: write
 
@@ -16,9 +18,9 @@ env:
 
 jobs:
   release:
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Tag matches manifests
         env:
@@ -28,7 +30,7 @@ jobs:
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           scripts/check-version-sync.sh "$VERSION"
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -36,7 +38,6 @@ jobs:
       - name: Install frontend deps
         working-directory: apps/stow-app
         run: npm ci
-      - uses: Swatinem/rust-cache@v2
 
       - name: Check signing secrets
         env:
@@ -79,7 +80,7 @@ jobs:
           cargo build --release --locked -p stow-cli --target aarch64-apple-darwin
           STAGE="stow-cli_${VERSION}_aarch64-apple-darwin"
           mkdir -p "$STAGE"
-          cp target/aarch64-apple-darwin/release/stw LICENSE LICENSE-MIT LICENSE-APACHE \
+          cp target/aarch64-apple-darwin/release/stw LICENSE-MIT LICENSE-APACHE \
              THIRD_PARTY_NOTICES.md THIRD_PARTY_LICENSES.md "$STAGE"/
           tar -czf "dist-release/$STAGE.tar.gz" "$STAGE"
 
