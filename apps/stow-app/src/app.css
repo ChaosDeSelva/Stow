@@ -1,0 +1,746 @@
+/* Stow theme, built from docs/design/DESIGN.md.
+   Cream canvas, white cards, 1px hairlines, one yellow primary per view, no shadows.
+
+   Density: the base spec sets body copy at 15–16 px and
+   controls at 36–40 px for a marketing/docs site. Stow is a dense three-pane desktop
+   tool, so UI text is 13 px (metadata 12 px, list titles/sidebar 13.5–14 px) and small
+   controls are 28 px. Rendered Markdown (.md) keeps the spec's 15 px body-sm reading
+   size. Everything else (palette, weights, radii, hairlines, no shadows) follows spec.
+
+   Contrast: --mute is darkened from the spec's #6c6e63 to #63655b so metadata on
+   --canvas/--surface-soft clears WCAG AA 4.5:1; --ash is for disabled UI only, never
+   for readable text. */
+
+:root {
+  --font-sans: "IBM Plex Sans Variable", "IBM Plex Sans", -apple-system, system-ui, sans-serif;
+  --font-mono: ui-monospace, "Source Code Pro", "JetBrains Mono", "SF Mono", Menlo, monospace;
+
+  /* Palette (source tokens) */
+  --primary: #f7a501;
+  --primary-pressed: #dd9001;
+  --primary-active: #b17816;
+  --on-primary: #23251d;
+  --ink: #23251d;
+  --body: #4d4f46;
+  --charcoal: #33342d;
+  --mute: #63655b;
+  --ash: #9b9c92;
+  --stone: #b6b7af;
+  --hairline: #bfc1b7;
+  --hairline-soft: #dcdfd2;
+  --on-dark: #ffffff;
+  --canvas: #eeefe9;
+  --surface-soft: #e5e7e0;
+  --surface-card: #ffffff;
+  --surface-doc: #fcfcfa;
+  --surface-dark: #23251d;
+  --link-blue: #1d4ed8;
+  --link-teal: #1078a3;
+  --accent-blue: #2c84e0;
+  --accent-blue-soft: #dceaf6;
+  --accent-red: #cd4239;
+  --accent-red-soft: #f7d6d3;
+  --accent-green: #2c8c66;
+  --accent-green-soft: #d9eddf;
+  --accent-purple: #7c44a6;
+  --accent-purple-soft: #e7d8ee;
+  --focus-ring: rgba(59, 130, 246, 0.5);
+  --scrim: rgba(35, 37, 29, 0.35);
+  /* Derived (accessibility): input borders ≥ 3:1 on white, readable status text. */
+  --input-border: #8f9187;
+  --ok-text: #1f6f4f;
+  --danger-text: #a52f28;
+  --info-text: #1d4ed8;
+  --warning-text: #8a5a00;
+
+  /* Shape */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius: 6px;
+  --radius-lg: 8px;
+  --control-h: 36px;
+  --control-h-sm: 28px;
+
+  color-scheme: light;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.43;
+  color: var(--body);
+  background-color: var(--canvas);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Dark is opt-in via settings.theme (resolved onto <html data-theme>); never from the OS alone. */
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --canvas: #1d1f1a;
+    --surface-soft: #2a2c25;
+    --surface-card: #23251d;
+    --surface-doc: #262821;
+    --surface-dark: #15160f;
+    --hairline: #3f4138;
+    --hairline-soft: #33352e;
+    --ink: #eeefe9;
+    --body: #c9cbc0;
+    --charcoal: #d9dbd0;
+    --mute: #9b9c92;
+    --ash: #85877c;
+    --stone: #5c5e54;
+    --link-teal: #4fb3dd;
+    --link-blue: #7fa6ff;
+    --accent-blue-soft: #1f3242;
+    --accent-green-soft: #1f3a2d;
+    --accent-red-soft: #452320;
+    --accent-purple-soft: #35253f;
+    --accent-red: #e8766d;
+    --accent-green: #4fb08a;
+    --accent-purple: #b58ad6;
+    --scrim: rgba(0, 0, 0, 0.55);
+    --input-border: #6f7166;
+    --ok-text: #6fcfa5;
+    --danger-text: #f0948c;
+    --info-text: #8fb4ff;
+    --warning-text: #f0c75e;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* #/capture lives in a transparent window: the page paints nothing, CapturePanel draws the card. */
+html.capture-window,
+html.capture-window body,
+html.capture-window #app {
+  background: transparent;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--ink);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+a {
+  color: var(--link-teal);
+  text-decoration: none;
+}
+a:hover,
+a:focus-visible {
+  text-decoration: underline;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+input,
+textarea,
+select {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* ---- Buttons: secondary by default, one yellow primary per view ------- */
+
+button,
+.btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: var(--control-h);
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: default;
+  white-space: nowrap;
+  transition: background-color 0.08s ease;
+}
+button:hover:not(:disabled) {
+  background: var(--hairline-soft);
+}
+button:active:not(:disabled) {
+  background: var(--hairline);
+}
+button:disabled {
+  color: var(--ash);
+  background: var(--surface-soft);
+}
+:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible,
+a:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 1px;
+}
+
+button.primary {
+  background: var(--primary);
+  color: var(--on-primary);
+  font-weight: 700;
+}
+button.primary:hover:not(:disabled) {
+  background: var(--primary-pressed);
+}
+button.primary:active:not(:disabled) {
+  background: var(--primary-active);
+}
+button.primary:disabled {
+  background: var(--surface-soft);
+  color: var(--ash);
+}
+button.danger {
+  color: var(--danger-text);
+}
+/* Destructive confirm: outlined red, never a second filled CTA colour. */
+button.outline-danger {
+  background: transparent;
+  color: var(--danger-text);
+  border-color: var(--danger-text);
+}
+button.outline-danger:hover:not(:disabled) {
+  background: var(--accent-red-soft);
+}
+button.ghost {
+  background: transparent;
+  color: var(--ink);
+  font-weight: 500;
+  padding: 0 10px;
+}
+button.ghost:hover:not(:disabled) {
+  background: var(--surface-soft);
+}
+button.ghost:active:not(:disabled) {
+  background: var(--hairline-soft);
+}
+button.ghost:disabled {
+  background: transparent;
+}
+button.ghost.danger {
+  color: var(--danger-text);
+}
+button.ghost.danger:hover:not(:disabled) {
+  background: var(--accent-red-soft);
+}
+button.small {
+  height: var(--control-h-sm);
+  padding: 0 10px;
+  font-size: 13px;
+  font-weight: 500;
+}
+button.small.primary {
+  font-weight: 600;
+}
+button.icon {
+  width: var(--control-h);
+  padding: 0;
+}
+button.icon.small {
+  width: var(--control-h-sm);
+}
+
+/* ---- Inputs ----------------------------------------------------------- */
+
+input[type="text"],
+input[type="url"],
+input[type="search"],
+input[type="password"],
+input[type="datetime-local"],
+input[type="number"],
+select,
+textarea {
+  height: var(--control-h);
+  padding: 0 12px;
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius);
+  background: var(--surface-card);
+  color: var(--ink);
+  font-size: 13px;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: -1px;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+textarea {
+  height: auto;
+  padding: 10px 12px;
+  line-height: 1.5;
+  resize: vertical;
+}
+input::placeholder,
+textarea::placeholder {
+  color: var(--mute);
+}
+input[readonly] {
+  color: var(--mute);
+  background: var(--surface-doc);
+}
+input[type="checkbox"],
+input[type="radio"] {
+  margin: 0 6px 0 0;
+  vertical-align: -1px;
+  accent-color: var(--ink);
+}
+label.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* ---- Text utilities ---------------------------------------------------- */
+
+.muted {
+  color: var(--mute);
+}
+.small {
+  font-size: 12px;
+}
+.mono {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.spacer {
+  flex: 1;
+}
+.selectable {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* badge-promo style pills */
+.chip {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 9999px;
+  background: var(--surface-soft);
+  color: var(--body);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  line-height: 1.5;
+}
+/* Soft accent background + ink text: ≥ 4.5:1 in both themes. */
+.chip.accent {
+  background: var(--accent-blue-soft);
+  color: var(--ink);
+}
+.chip.danger {
+  background: var(--accent-red-soft);
+  color: var(--ink);
+}
+.chip.success {
+  background: var(--accent-green-soft);
+  color: var(--ink);
+}
+.chip.warning {
+  background: var(--surface-soft);
+  color: var(--warning-text);
+}
+
+/* Status dot (snapshot / job state) */
+.dot {
+  display: inline-block;
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--stone);
+}
+.dot.running {
+  background: var(--accent-blue);
+}
+.dot.done {
+  background: var(--accent-green);
+}
+.dot.failed {
+  background: var(--accent-red);
+}
+
+.empty {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--mute);
+}
+
+/* utility-xs eyebrow */
+.section-title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+hr.hairline {
+  border: 0;
+  border-top: 1px solid var(--hairline);
+  margin: 10px 0;
+}
+
+/* Bucket emoji in a small soft square */
+.emoji-box {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+  border: 1px solid var(--hairline-soft);
+  font-size: 13px;
+  line-height: 1;
+}
+
+/* Banner tips (toasts, notices) */
+.banner {
+  display: flex;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  color: var(--ink);
+  background: var(--accent-blue-soft);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.banner.red {
+  background: var(--accent-red-soft);
+}
+.banner.green {
+  background: var(--accent-green-soft);
+}
+.banner.purple {
+  background: var(--accent-purple-soft);
+}
+/* Leading icon in a banner: the strong accent of the banner's soft tint. */
+.banner > .banner-icon {
+  flex: none;
+  margin-top: 0.2em;
+  color: var(--accent-blue);
+}
+.banner.red > .banner-icon {
+  color: var(--accent-red);
+}
+.banner.green > .banner-icon {
+  color: var(--accent-green);
+}
+.banner.purple > .banner-icon {
+  color: var(--accent-purple);
+}
+.confirm-icon {
+  color: var(--accent-red);
+}
+.saved-icon {
+  color: var(--accent-green);
+}
+
+/* pill-tabs (detail pane) */
+.pill-tabs {
+  display: flex;
+  gap: 4px;
+}
+.pill-tabs button {
+  height: 28px;
+  padding: 0 14px;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--body);
+  font-size: 13px;
+  font-weight: 500;
+}
+.pill-tabs button:hover:not(:disabled) {
+  background: var(--surface-soft);
+}
+.pill-tabs button.active {
+  background: var(--ink);
+  color: var(--canvas);
+}
+.pill-tabs button.active:hover:not(:disabled) {
+  background: var(--ink);
+}
+
+/* product-tabs (toggles on the cream canvas / soft strips) */
+.product-tabs {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+}
+.product-tabs button {
+  height: 24px;
+  padding: 0 10px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--body);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.product-tabs button:hover:not(:disabled) {
+  background: var(--hairline-soft);
+}
+.product-tabs button.active {
+  background: var(--surface-card);
+  color: var(--ink);
+}
+
+/* ---- Rendered Markdown (body-sm) --------------------------------------- */
+
+.md {
+  user-select: text;
+  -webkit-user-select: text;
+  font-size: 15px;
+  line-height: 1.71;
+  max-width: 72ch;
+  color: var(--body);
+  word-wrap: break-word;
+}
+.md > :first-child {
+  margin-top: 0;
+}
+.md > :last-child {
+  margin-bottom: 0;
+}
+.md h1,
+.md h2,
+.md h3,
+.md h4 {
+  color: var(--ink);
+  line-height: 1.4;
+  margin: 1.2em 0 0.4em;
+}
+.md h1 {
+  font-size: 1.4em;
+  letter-spacing: -0.5px;
+}
+.md h2 {
+  font-size: 1.25em;
+}
+.md h3 {
+  font-size: 1.1em;
+}
+.md p,
+.md ul,
+.md ol,
+.md pre,
+.md blockquote,
+.md table {
+  margin: 0 0 0.8em;
+}
+.md strong {
+  color: var(--ink);
+}
+.md a {
+  color: var(--link-teal);
+  text-decoration: none;
+}
+.md a:hover {
+  text-decoration: underline;
+}
+.md pre {
+  padding: 14px 18px;
+  border-radius: var(--radius);
+  background: var(--surface-dark);
+  color: var(--on-dark);
+  overflow: auto;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.md code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--surface-soft);
+  padding: 1px 6px;
+  border-radius: var(--radius-xs);
+}
+.md pre code {
+  background: none;
+  color: inherit;
+  font-weight: 400;
+  padding: 0;
+}
+.md blockquote {
+  margin-left: 0;
+  padding: 2px 0 2px 14px;
+  border-left: 3px solid var(--hairline);
+  color: var(--mute);
+}
+.md img {
+  max-width: 100%;
+  border-radius: var(--radius);
+  border: 1px solid var(--hairline);
+}
+.md table {
+  border-collapse: collapse;
+}
+.md th,
+.md td {
+  border: 1px solid var(--hairline-soft);
+  padding: 4px 10px;
+}
+.md th {
+  background: var(--surface-soft);
+  color: var(--ink);
+}
+.md hr {
+  border: 0;
+  border-top: 1px solid var(--hairline);
+}
+.md input[type="checkbox"] {
+  margin-right: 6px;
+}
+
+/* ---- Scrollbars -------------------------------------------------------- */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--hairline);
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ---- Floating surfaces (menus, popovers, dropdowns) -------------------- */
+/* No shadows (spec): a stronger --stone edge separates them from the page. */
+.floating {
+  background: var(--surface-card);
+  border: 1px solid var(--stone);
+  border-radius: var(--radius);
+}
+
+/* ---- Accessibility ------------------------------------------------------ */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Hover-revealed controls stay reachable by keyboard. */
+.reveal {
+  opacity: 0;
+}
+:hover > .reveal,
+:focus-within > .reveal,
+.reveal:focus-visible,
+.reveal:focus {
+  opacity: 1;
+}
+
+.ok-text {
+  color: var(--ok-text);
+  font-weight: 600;
+}
+.danger-text {
+  color: var(--danger-text);
+}
+
+details.err-details summary {
+  cursor: default;
+  font-size: 12px;
+  color: var(--mute);
+}
+details.err-details pre {
+  margin: 4px 0 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--body);
+}
+
+kbd {
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 0 5px;
+  border-radius: var(--radius-xs);
+  background: var(--surface-soft);
+  color: var(--ink);
+}
+
+/* Status dot with a text label next to it (Allowed / Not allowed / Not asked yet). */
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: none;
+  background: var(--stone);
+}
+.status-dot.ok {
+  background: var(--accent-green);
+}
+.status-dot.bad {
+  background: var(--accent-red);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

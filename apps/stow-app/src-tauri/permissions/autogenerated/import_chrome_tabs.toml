@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-import-chrome-tabs"
+description = "Enables the import_chrome_tabs command without any pre-configured scope."
+commands.allow = ["import_chrome_tabs"]
+
+[[permission]]
+identifier = "deny-import-chrome-tabs"
+description = "Denies the import_chrome_tabs command without any pre-configured scope."
+commands.deny = ["import_chrome_tabs"]

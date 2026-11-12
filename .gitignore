@@ -1,0 +1,42 @@
+# Rust build output (workspace root; src-tauri is a workspace member)
+/target/
+
+# Frontend
+node_modules/
+apps/stow-app/dist/
+vite.config.ts.timestamp-*
+
+# Packaged artifacts (`just package-extension`, release builds)
+/out/
+*.dmg
+*.app.tar.gz
+*.app.tar.gz.sig
+
+# Secrets and local env
+.env
+.env.*
+!.env.example
+*.p12
+*.p8
+*.pem
+*.key
+*.mobileprovision
+
+# Local Stow data accidentally created in the tree (STOW_DATA_DIR pointed here)
+*.db
+*.db-shm
+*.db-wal
+
+# OS / editor noise
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Tool and agent scratch
+.lavish/
+.claude/settings.local.json
+
+# NOTE: apps/stow-app/src-tauri/gen/schemas (Tauri capability JSON schemas) is
+# tracked on purpose: capabilities/*.json reference it via "$schema", and CI
+# should not need a Tauri build to validate them. Do not ignore `gen/`.

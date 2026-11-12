@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-reminder-agenda"
+description = "Enables the reminder_agenda command without any pre-configured scope."
+commands.allow = ["reminder_agenda"]
+
+[[permission]]
+identifier = "deny-reminder-agenda"
+description = "Denies the reminder_agenda command without any pre-configured scope."
+commands.deny = ["reminder_agenda"]

@@ -1,0 +1,94 @@
+# cargo-deny configuration. Run `cargo deny check` (CI does, on every push).
+# https://embarkstudios.github.io/cargo-deny/
+#
+# cargo-deny only sees Rust crates. npm packages (Font Awesome icons CC-BY-4.0, IBM Plex OFL-1.1,
+# DOMPurify, marked, ...) are covered by scripts/collect-licenses.sh, which generates
+# THIRD_PARTY_LICENSES.md; see THIRD_PARTY_NOTICES.md.
+
+[graph]
+targets = [{ triple = "aarch64-apple-darwin" }, { triple = "x86_64-apple-darwin" }]
+all-features = false
+
+[advisories]
+version = 2
+db-urls = ["https://github.com/rustsec/advisory-db"]
+yanked = "deny"
+ignore = [
+  # Add RUSTSEC ids here with a reason, e.g.
+  # { id = "RUSTSEC-2024-0000", reason = "only reachable via gtk on linux; not built" },
+]
+
+[licenses]
+version = 2
+confidence-threshold = 0.9
+# Permissive licenses only. MPL-2.0 (cssparser via scraper) is file-scoped weak copyleft and
+# fine for a MIT OR Apache-2.0 app. Keep this list to licenses that actually occur in Cargo.lock:
+# cargo-deny warns (license-not-encountered) about entries nothing uses.
+allow = [
+  "MIT",
+  "MIT-0",
+  "Apache-2.0",
+  "BSD-2-Clause",
+  "BSD-3-Clause",
+  "0BSD",
+  "ISC",
+  "Zlib",
+  "BSL-1.0",
+  "Unicode-3.0",
+  "Unlicense",
+  "CC0-1.0",
+  "MPL-2.0",
+]
+exceptions = []
+# No [[licenses.clarify]] entries: ring >= 0.17.9 declares `Apache-2.0 AND ISC` itself, and
+# aws-lc-sys 0.47 no longer carries the OpenSSL expression.
+
+[bans]
+multiple-versions = "warn"
+# Workspace crates depend on stow-core by `path` without a version. That is fine for crates with
+# `publish = false` (allow-wildcard-paths), but cargo-deny still flags stow-app because
+# apps/stow-app/src-tauri/Cargo.toml does not inherit `publish.workspace = true`. Add that line
+# and flip this back to "deny".
+wildcards = "deny"
+allow-wildcard-paths = true
+highlight = "all"
+deny = [
+  { crate = "openssl-sys", reason = "rustls everywhere; no OpenSSL" },
+  { crate = "native-tls", reason = "rustls everywhere; no OpenSSL" },
+]
+# Duplicate versions we cannot collapse from this workspace (two upstream generations in the
+# dependency graph). Each entry names the *older* one; drop it once the parent catches up.
+skip = [
+  { crate = "base64@0.21", reason = "rmcp / older transitive" },
+  { crate = "bit-set@0.8", reason = "selectors (tauri-utils html5ever family)" },
+  { crate = "bit-vec@0.8", reason = "bit-set 0.8" },
+  { crate = "dirs@6", reason = "auto-launch (tauri-plugin-autostart)" },
+  { crate = "getrandom@0.3", reason = "rand 0.9 ecosystem" },
+  { crate = "hashbrown@0.12", reason = "indexmap 1 (tauri codegen)" },
+  { crate = "indexmap@1", reason = "tauri codegen" },
+  { crate = "keyboard-types@0.7", reason = "tauri runtime / tray" },
+  { crate = "miniz_oxide@0.8", reason = "png / flate2 transitive" },
+  { crate = "nom@7", reason = "older transitive" },
+  { crate = "schemars@0.8", reason = "tauri-utils" },
+  { crate = "schemars_derive@0.8", reason = "schemars 0.8" },
+  { crate = "serde_derive_internals@0.29", reason = "schemars_derive 0.8" },
+  { crate = "shlex@1", reason = "cc build scripts" },
+  { crate = "tower-http@0.6", reason = "reqwest 0.13" },
+]
+skip-tree = [
+  # sha2 0.10 (older RustCrypto generation: digest, block-buffer, crypto-common, cpufeatures)
+  # alongside sha2 0.11 from stow-core.
+  { crate = "sha2@0.10", depth = 3 },
+  # tauri-utils parses HTML with dom_query 0.28 (html5ever 0.38/0.39); scraper and dom_smoothie
+  # use dom_query 0.29 (html5ever 0.40). The whole markup5ever/string_cache/phf/selectors family
+  # comes in twice until Tauri bumps.
+  { crate = "dom_query@0.28", depth = 20 },
+  { crate = "html5ever@0.38", depth = 20 },
+  { crate = "html5ever@0.39", depth = 20 },
+]
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []

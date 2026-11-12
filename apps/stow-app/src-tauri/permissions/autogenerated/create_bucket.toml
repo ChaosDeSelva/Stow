@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-create-bucket"
+description = "Enables the create_bucket command without any pre-configured scope."
+commands.allow = ["create_bucket"]
+
+[[permission]]
+identifier = "deny-create-bucket"
+description = "Denies the create_bucket command without any pre-configured scope."
+commands.deny = ["create_bucket"]

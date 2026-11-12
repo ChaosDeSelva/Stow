@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-set-item-done"
+description = "Enables the set_item_done command without any pre-configured scope."
+commands.allow = ["set_item_done"]
+
+[[permission]]
+identifier = "deny-set-item-done"
+description = "Denies the set_item_done command without any pre-configured scope."
+commands.deny = ["set_item_done"]

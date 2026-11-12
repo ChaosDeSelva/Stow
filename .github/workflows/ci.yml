@@ -1,0 +1,121 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  # CI runners have no Metal device; keep whisper.cpp on the CPU path.
+  STOW_WHISPER_CPU: "1"
+
+jobs:
+  rust:
+    name: Rust (fmt, clippy, test)
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: apps/stow-app/package-lock.json
+      # tauri::generate_context! needs apps/stow-app/dist to exist at compile time.
+      - name: Build frontend
+        working-directory: apps/stow-app
+        run: npm ci && npm run build
+      - name: Rust toolchain (from rust-toolchain.toml)
+        run: rustup show active-toolchain
+      - uses: Swatinem/rust-cache@v2
+      - name: rustfmt
+        run: cargo fmt --all -- --check
+      - name: clippy
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+      - name: test
+        run: cargo test --workspace --locked
+      - name: CLI smoke test
+        run: cargo build --release --locked -p stow-cli && target/release/stw --help >/dev/null
+
+  frontend:
+    name: Frontend (svelte-check, vitest, build)
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: apps/stow-app/package-lock.json
+      - name: Install
+        working-directory: apps/stow-app
+        run: npm ci
+      - name: svelte-check
+        working-directory: apps/stow-app
+        run: npm run check
+      - name: Vitest (UTC)
+        working-directory: apps/stow-app
+        run: npm test
+        env:
+          TZ: UTC
+      - name: Vitest (America/Los_Angeles)
+        working-directory: apps/stow-app
+        run: npm test
+        env:
+          TZ: America/Los_Angeles
+      - name: Build
+        working-directory: apps/stow-app
+        run: npm run build
+      - name: npm audit (production deps)
+        working-directory: apps/stow-app
+        run: npm audit --omit=dev
+      # On macOS, like the machine that generates the file: npm's optional deps differ on Linux.
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-about
+      - name: THIRD_PARTY_LICENSES.md is current
+        run: scripts/collect-licenses.sh --check
+
+  extension:
+    name: Chrome extension
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Syntax check
+        run: node --check extension/background.js extension/options.js extension/lib.js
+      - name: Tests
+        run: node --test 'extension/*.test.mjs'
+      - name: Package
+        run: scripts/package-extension.sh out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stow-extension
+          path: out/*.zip
+          retention-days: 7
+
+  supply-chain:
+    name: Supply chain (deny, audit, versions)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Version sync
+        run: scripts/check-version-sync.sh
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-audit
+      - name: cargo audit
+        run: cargo audit

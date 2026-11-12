@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-reorder-buckets"
+description = "Enables the reorder_buckets command without any pre-configured scope."
+commands.allow = ["reorder_buckets"]
+
+[[permission]]
+identifier = "deny-reorder-buckets"
+description = "Denies the reorder_buckets command without any pre-configured scope."
+commands.deny = ["reorder_buckets"]

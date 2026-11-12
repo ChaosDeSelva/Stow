@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-whisper-model-downloaded"
+description = "Enables the whisper_model_downloaded command without any pre-configured scope."
+commands.allow = ["whisper_model_downloaded"]
+
+[[permission]]
+identifier = "deny-whisper-model-downloaded"
+description = "Denies the whisper_model_downloaded command without any pre-configured scope."
+commands.deny = ["whisper_model_downloaded"]

@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-list-chrome-tabs"
+description = "Enables the list_chrome_tabs command without any pre-configured scope."
+commands.allow = ["list_chrome_tabs"]
+
+[[permission]]
+identifier = "deny-list-chrome-tabs"
+description = "Denies the list_chrome_tabs command without any pre-configured scope."
+commands.deny = ["list_chrome_tabs"]

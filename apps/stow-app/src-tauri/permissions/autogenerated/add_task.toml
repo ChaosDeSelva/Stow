@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-add-task"
+description = "Enables the add_task command without any pre-configured scope."
+commands.allow = ["add_task"]
+
+[[permission]]
+identifier = "deny-add-task"
+description = "Denies the add_task command without any pre-configured scope."
+commands.deny = ["add_task"]

@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-respond-pair"
+description = "Enables the respond_pair command without any pre-configured scope."
+commands.allow = ["respond_pair"]
+
+[[permission]]
+identifier = "deny-respond-pair"
+description = "Denies the respond_pair command without any pre-configured scope."
+commands.deny = ["respond_pair"]

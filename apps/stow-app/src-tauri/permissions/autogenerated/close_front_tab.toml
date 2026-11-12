@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-close-front-tab"
+description = "Enables the close_front_tab command without any pre-configured scope."
+commands.allow = ["close_front_tab"]
+
+[[permission]]
+identifier = "deny-close-front-tab"
+description = "Denies the close_front_tab command without any pre-configured scope."
+commands.deny = ["close_front_tab"]

@@ -1,0 +1,61 @@
+name: Bug report
+description: Something in Stow doesn't work the way the docs say it should.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Security problems go through [private vulnerability reporting](https://github.com/ChaosDeSelva/Stow/security/advisories/new), not here.
+        Please don't paste API keys, the extension pairing code, or links you'd rather keep private.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what you saw instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open …
+        2. Press ⌃⌘S …
+        3. …
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Stow version
+      description: Bottom of Settings → Data, or `stw --version`.
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version and chip
+      placeholder: "macOS 15.2, Apple Silicon"
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - App
+        - Quick capture (⌃⌘S)
+        - Chrome extension
+        - stw CLI
+        - MCP server
+        - Recording / transcription
+        - AI actions
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: "`stw doctor` output (optional)"
+      render: text

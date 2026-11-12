@@ -1,0 +1,25 @@
+# cargo-about configuration used by scripts/collect-licenses.sh (not picked up automatically;
+# the script passes `-c scripts/licenses/about.toml`). Keep `accepted` in step with
+# [licenses].allow in deny.toml.
+accepted = [
+  "MIT",
+  "MIT-0",
+  "Apache-2.0",
+  "BSD-2-Clause",
+  "BSD-3-Clause",
+  "0BSD",
+  "ISC",
+  "Zlib",
+  "BSL-1.0",
+  "Unicode-3.0",
+  "Unlicense",
+  "CC0-1.0",
+  "MPL-2.0",
+]
+targets = ["aarch64-apple-darwin", "x86_64-apple-darwin"]
+# Build scripts and their dependencies (cc, bindgen, tauri-build, ...) and dev-dependencies are
+# not part of any shipped binary.
+ignore-build-dependencies = true
+ignore-dev-dependencies = true
+# Pick one license per crate when it offers a choice; the first match in `accepted` wins, so
+# dual MIT OR Apache-2.0 crates are listed under MIT.

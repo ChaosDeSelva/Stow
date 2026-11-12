@@ -1,0 +1,25 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "capture",
+  "description": "Quick-capture panel: only what saving the front tab needs",
+  "windows": [
+    "capture"
+  ],
+  "permissions": [
+    "core:event:default",
+    "core:window:default",
+    "core:window:allow-hide",
+    "core:window:allow-set-focus",
+    "core:window:allow-start-dragging",
+    "clipboard-manager:allow-read-text",
+    "allow-add-item",
+    "allow-capture-front-tab",
+    "allow-close-front-tab",
+    "allow-hide-capture",
+    "allow-list-buckets",
+    "allow-create-bucket",
+    "allow-capture-settings",
+    "allow-set-close-tab-after-capture",
+    "allow-app-info"
+  ]
+}

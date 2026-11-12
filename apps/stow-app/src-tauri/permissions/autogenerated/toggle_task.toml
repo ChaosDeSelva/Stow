@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-toggle-task"
+description = "Enables the toggle_task command without any pre-configured scope."
+commands.allow = ["toggle_task"]
+
+[[permission]]
+identifier = "deny-toggle-task"
+description = "Denies the toggle_task command without any pre-configured scope."
+commands.deny = ["toggle_task"]

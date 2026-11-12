@@ -1,0 +1,103 @@
+name: Release
+
+# Push a tag like v0.2.0 (see RELEASING.md). Produces a DRAFT GitHub Release with the signed,
+# notarized DMG, the stw CLI tarball, the Chrome extension zip, and SHA256SUMS.
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+  STOW_WHISPER_CPU: "1"
+
+jobs:
+  release:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Tag matches manifests
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          VERSION="${TAG#v}"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          scripts/check-version-sync.sh "$VERSION"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: apps/stow-app/package-lock.json
+      - name: Install frontend deps
+        working-directory: apps/stow-app
+        run: npm ci
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Check signing secrets
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+        run: |
+          if [ -z "$APPLE_CERTIFICATE" ] || [ -z "$APPLE_ID" ]; then
+            echo "::error::Signing/notarization secrets are not set. See RELEASING.md > Notarization prerequisites."
+            exit 1
+          fi
+
+      # The Tauri bundler imports the certificate, signs with the hardened runtime,
+      # notarizes with notarytool, and staples when these variables are set.
+      - name: Build, sign, and notarize Stow.app + DMG
+        working-directory: apps/stow-app
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: npm run tauri build -- --target aarch64-apple-darwin
+
+      - name: Collect artifacts
+        run: |
+          set -euo pipefail
+          mkdir -p dist-release
+          BUNDLE=target/aarch64-apple-darwin/release/bundle
+          APP="$BUNDLE/macos/Stow.app"
+          for f in THIRD_PARTY_NOTICES.md THIRD_PARTY_LICENSES.md; do
+            test -f "$APP/Contents/Resources/$f" || { echo "::error::$f missing from Stow.app Resources"; exit 1; }
+          done
+          cp "$BUNDLE"/dmg/Stow_"$VERSION"_aarch64.dmg dist-release/
+          xcrun stapler validate dist-release/Stow_"$VERSION"_aarch64.dmg
+
+      - name: Build CLI
+        run: |
+          set -euo pipefail
+          cargo build --release --locked -p stow-cli --target aarch64-apple-darwin
+          STAGE="stow-cli_${VERSION}_aarch64-apple-darwin"
+          mkdir -p "$STAGE"
+          cp target/aarch64-apple-darwin/release/stw LICENSE LICENSE-MIT LICENSE-APACHE \
+             THIRD_PARTY_NOTICES.md THIRD_PARTY_LICENSES.md "$STAGE"/
+          tar -czf "dist-release/$STAGE.tar.gz" "$STAGE"
+
+      - name: Package extension
+        run: scripts/package-extension.sh dist-release
+
+      - name: Checksums and release notes
+        run: |
+          set -euo pipefail
+          (cd dist-release && shasum -a 256 * > SHA256SUMS)
+          scripts/changelog-section.sh "$VERSION" > release-notes.md
+
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          PRERELEASE=""
+          case "$TAG" in *-*) PRERELEASE="--prerelease" ;; esac
+          gh release create "$TAG" dist-release/* --draft $PRERELEASE \
+            --title "Stow $VERSION" --notes-file release-notes.md

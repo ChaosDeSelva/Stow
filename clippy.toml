@@ -1,0 +1,2 @@
+# Words clippy::doc_markdown should accept without backticks. ".." keeps the defaults.
+doc-valid-idents = ["SQLite", ".."]

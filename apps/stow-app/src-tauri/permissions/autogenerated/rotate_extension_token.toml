@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-rotate-extension-token"
+description = "Enables the rotate_extension_token command without any pre-configured scope."
+commands.allow = ["rotate_extension_token"]
+
+[[permission]]
+identifier = "deny-rotate-extension-token"
+description = "Denies the rotate_extension_token command without any pre-configured scope."
+commands.deny = ["rotate_extension_token"]

@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-delete-bucket"
+description = "Enables the delete_bucket command without any pre-configured scope."
+commands.allow = ["delete_bucket"]
+
+[[permission]]
+identifier = "deny-delete-bucket"
+description = "Denies the delete_bucket command without any pre-configured scope."
+commands.deny = ["delete_bucket"]
