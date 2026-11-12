@@ -136,8 +136,9 @@ fn resource_error(uri: &str, e: &StowError) -> McpError {
 }
 
 #[tool_handler(router = self.tool_router)]
-// The generated `list_tools` is `async` without an `.await`.
-#[allow(clippy::unused_async)]
+// The generated `list_tools` is `async` without an `.await`. Newer clippy reports this as
+// `unused_async_trait_impl`, older as `unused_async`; allow both so every toolchain is clean.
+#[allow(unknown_lints, clippy::unused_async, clippy::unused_async_trait_impl)]
 impl ServerHandler for StowMcp {
     fn get_info(&self) -> ServerConfig {
         let mut instructions = INSTRUCTIONS.to_string();

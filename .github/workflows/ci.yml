@@ -80,7 +80,7 @@ jobs:
       # On macOS, like the machine that generates the file: npm's optional deps differ on Linux.
       - uses: taiki-e/install-action@cfdb7ed4ccc7c7dce37759eae89dc5674b469b39 # v2.90.3
         with:
-          tool: cargo-about
+          tool: cargo-about@0.9.3
       - name: THIRD_PARTY_LICENSES.md is current
         run: scripts/collect-licenses.sh --check
 

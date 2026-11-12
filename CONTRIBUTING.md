@@ -119,7 +119,7 @@ The Cargo package is `stow-cli`; the installed binary is `stw` (so it never shad
 
 ## Dependencies and licenses
 
-`THIRD_PARTY_LICENSES.md` is generated from `Cargo.lock` and `apps/stow-app/node_modules` and committed. After adding or bumping a dependency, run `just licenses` (needs `cargo install cargo-about --locked --features cli`) and commit the result; CI runs `scripts/collect-licenses.sh --check` and fails if the file is stale. A new license kind must be added to both `deny.toml` (`[licenses].allow`) and `scripts/licenses/about.toml`, and anything user-visible (a font, an icon set, a native library) gets a row in `THIRD_PARTY_NOTICES.md`.
+`THIRD_PARTY_LICENSES.md` is generated from `Cargo.lock` and `apps/stow-app/node_modules` and committed. After adding or bumping a dependency, run `just licenses` (needs `cargo install cargo-about --locked --features cli --version 0.9.3`) and commit the result; CI runs `scripts/collect-licenses.sh --check` and fails if the file is stale. A new license kind must be added to both `deny.toml` (`[licenses].allow`) and `scripts/licenses/about.toml`, and anything user-visible (a font, an icon set, a native library) gets a row in `THIRD_PARTY_NOTICES.md`.
 
 ## Commits and pull requests
 

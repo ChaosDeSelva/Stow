@@ -50,7 +50,7 @@ release-check: lint test
     scripts/collect-licenses.sh --check
 
 # Regenerate THIRD_PARTY_LICENSES.md from Cargo.lock + node_modules (needs cargo-about:
-# `cargo install cargo-about --locked --features cli`). Commit the result. `just licenses check`
+# `cargo install cargo-about --locked --features cli --version 0.9.3`). Commit the result. `just licenses check`
 # only verifies the committed file is current (CI does this).
 licenses mode="":
     scripts/collect-licenses.sh {{ if mode == "check" { "--check" } else { "" } }}

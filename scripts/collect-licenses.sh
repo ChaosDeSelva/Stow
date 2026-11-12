@@ -5,7 +5,7 @@
 #   scripts/collect-licenses.sh          regenerate THIRD_PARTY_LICENSES.md in place
 #   scripts/collect-licenses.sh --check  regenerate to a temp file and fail if it differs
 #
-# Needs: cargo-about (`cargo install cargo-about --locked --features cli`), node, jq, and an
+# Needs: cargo-about (`cargo install cargo-about --locked --features cli --version 0.9.3`), node, jq, and an
 # installed apps/stow-app/node_modules (`npm ci`). Output is deterministic (sorted, no dates) so
 # CI can diff it; THIRD_PARTY_NOTICES.md explains how both files are delivered to users.
 set -euo pipefail
@@ -23,7 +23,7 @@ for tool in cargo node jq npm; do
   command -v "$tool" >/dev/null || { echo "collect-licenses: missing $tool" >&2; exit 1; }
 done
 if ! cargo about --version >/dev/null 2>&1; then
-  echo "collect-licenses: cargo-about not installed. Run: cargo install cargo-about --locked --features cli" >&2
+  echo "collect-licenses: cargo-about not installed. Run: cargo install cargo-about --locked --features cli --version 0.9.3" >&2
   exit 1
 fi
 if [ ! -d "$APP/node_modules" ]; then
