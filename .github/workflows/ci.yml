@@ -98,7 +98,7 @@ jobs:
         run: node --test 'extension/*.test.mjs'
       - name: Package
         run: scripts/package-extension.sh out
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: stow-extension
           path: out/*.zip
