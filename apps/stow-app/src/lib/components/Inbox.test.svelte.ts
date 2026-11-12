@@ -682,7 +682,9 @@ describe("Add link form layout", () => {
     const field = form.querySelector("#addlink-url") as HTMLTextAreaElement;
     expect(field.classList.contains("mono")).toBe(false);
     expect(form.querySelector(".mono")).toBeNull();
-    expect(getComputedStyle(field).fontFamily).not.toMatch(/mono/i);
+    // No computed-font check: component CSS isn't loaded under Vitest, so jsdom (31+) reports
+    // its own user-agent default for <textarea> (monospace). The .mono checks above are the
+    // contract; app.css (`font: inherit`) and the component style set the sans face.
     expect(field.getAttribute("placeholder")).toContain("Paste one or more links");
     // Row 2: count, clipboard chip and hint are siblings of one row (never stacked).
     const meta = form.querySelector(".meta")!;
