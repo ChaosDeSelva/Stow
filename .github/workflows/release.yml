@@ -7,8 +7,8 @@ on:
   push:
     tags: ["v*"]
 
-# No cache action here: this job holds the signing secrets, so it runs only pinned
-# first-party actions and a cold build.
+# No caches of any kind here (no rust-cache, no setup-node cache): this job holds the
+# signing secrets, so it starts cold and restores nothing another workflow could have written.
 permissions:
   contents: write
 
@@ -33,8 +33,6 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
-          cache: npm
-          cache-dependency-path: apps/stow-app/package-lock.json
       - name: Install frontend deps
         working-directory: apps/stow-app
         run: npm ci
